@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8d2da152-626a-49ab-9ffb-192fbb52ea3a" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="3241e0ed-6547-4369-adfb-4baaff5cb63d" >
+		<salesforce:basic-connection username="mulesf@mulesoft.com" password="ASDfgh@123" securityToken="PCIJ0fhy8fxFaK1dWJVd8xZE" url="https://login.salesforce.com/services/Soap/u/46.0"/>
+	</salesforce:sfdc-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="90da0380-5799-4dd1-b7aa-d9c61c3789cf" file="http.yaml" />
+	<flow name="poc-salesforce-query-07012021Flow" doc:id="77c9af97-2dfc-4cd6-bc20-d04fc779b962" >
+		<http:listener doc:name="Listener" doc:id="77001321-10c3-4be4-840b-846f600513c3" config-ref="HTTP_Listener_config" path="/contacts"/>
+		<salesforce:query doc:name="Query ---details from contact object" doc:id="e37df166-eb12-4f89-b666-53a01821524c" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT ID,FirstName, LastName, Email, Phone from Contact limit 100]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="8f0347b6-1709-45bc-8a9e-8c2ca46d36c3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="poc-salesforce-query-07012021Flow1" doc:id="13aaf5b3-6353-4dc2-b5d1-6e04bc5fcab8" >
+		<http:listener doc:name="Listener" doc:id="bcff5a57-4461-4f82-a6e2-cea238aedb44" config-ref="HTTP_Listener_config" path="/account"/>
+		<salesforce:query doc:name="Query" doc:id="d4f8b830-ec58-479c-aeef-03925c0c26ae" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT AccountNumber, Ownership, Rating, Industry from Account limit 200]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="326e96f3-abd7-47d1-b456-5b184161c4a0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

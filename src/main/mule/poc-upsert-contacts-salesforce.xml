@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="poc-upsert-contacts-salesforceFlow" doc:id="ca444b01-288c-4c10-b329-6da7bdda87d8" >
+		<http:listener doc:name="Listener" doc:id="f00ebfde-ed55-4354-aabf-46dfd4920d28" config-ref="HTTP_Listener_config" path="/contacts" allowedMethods="PUT"/>
+		<ee:transform doc:name="Transform Message" doc:id="780d4e17-70d5-4222-a0f9-77b163effaaa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map(item,index) ->{
+	FirstName:item.firstName,
+	LastName: item.lastName,
+	Phone: item.mobile,
+	Email: item.email
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:upsert objectType="Contact" externalIdFieldName="Email" doc:name="Upsert" doc:id="b217fba2-2fdc-403e-aec5-7c843f719693" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="e9e31be5-29ab-450b-a7b0-6eba27122fc5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
