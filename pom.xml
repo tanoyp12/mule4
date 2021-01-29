@@ -38,8 +38,7 @@
 						<environment>Sanbox</environment>
 						<applicationName>poc-salesforce-query</applicationName>
 						<workers>1</workers>
-						<workerType>MICRO</workerType>
-						
+						<workerType>MICRO</workerType>						
 					</cloudHubDeployment>
 				</configuration>
 			</plugin>
